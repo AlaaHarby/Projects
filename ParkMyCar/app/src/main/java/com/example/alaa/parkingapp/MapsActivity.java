@@ -7,12 +7,12 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,9 +28,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import rx.Observer;
@@ -51,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DBAdapter mDBadapter;
     private SharedPreferences mSharedPref;
     private String mEmail;
-    private List<Parking> mParkings;
+    private HashMap<String, String> mParkings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mParkings = new ArrayList<Parking>();
+        mParkings = new HashMap<>();
         mMarker = (FloatingActionButton) findViewById(R.id.add_marker);
     }
 
@@ -109,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 // get new location of ur marker
-                mDBadapter.addParking(new Parking(marker.getPosition().latitude,
+                mDBadapter.addParking(new Parking(mParkings.get(marker.getId()), marker.getPosition().latitude,
                         marker.getPosition().longitude, mEmail, ""));
             }
         });
@@ -126,8 +127,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng loc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
                 Marker m = mMap.addMarker(new MarkerOptions().position(loc).draggable(true));
 
-                mDBadapter.addParking(new Parking( loc.latitude,
-                        loc.longitude, mEmail, ""));
+                Parking p = new Parking(UUID.randomUUID().toString(), loc.latitude,
+                        loc.longitude, mEmail, "");
+                mDBadapter.addParking(p);
+                mParkings.put(m.getId(), p.getParkingID());
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 15));
                 getAddress();
@@ -137,17 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         (mDBadapter.getMarkers()).subscribe(new Observer<Parking>() {
             @Override
             public void onCompleted() {
-                for (Parking parking : mParkings) {
-                    LatLng loc = new LatLng(parking.getLatitude(), parking.getLongitude());
-                    MarkerOptions opts;
-                    if (parking.getEmail().equals(mEmail))
-                        opts = new MarkerOptions().position(loc).draggable(true);
-                    else
-                        opts = new MarkerOptions().position(loc)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 
-                    mMap.addMarker(opts);
-                }
             }
 
             @Override
@@ -157,7 +150,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onNext(Parking parking) {
-               mParkings.add(parking);
+                LatLng loc = new LatLng(parking.getLatitude(), parking.getLongitude());
+                MarkerOptions opts;
+                if (parking.getEmail().equals(mEmail))
+                    opts = new MarkerOptions().position(loc).draggable(true);
+                else
+                    opts = new MarkerOptions().position(loc)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+                Marker m = mMap.addMarker(opts);
+                mParkings.put(m.getId(), parking.getParkingID());
             }
         });
 

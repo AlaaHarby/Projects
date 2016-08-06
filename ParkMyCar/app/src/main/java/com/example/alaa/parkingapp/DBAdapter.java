@@ -7,8 +7,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.UUID;
-
 import rx.Observable;
 import rx.Subscriber;
 
@@ -76,6 +74,6 @@ public class DBAdapter {
     }
 
     public void addParking(Parking parking){
-        mDB.child(DBContract.PARKING_DB).child(UUID.randomUUID().toString()).setValue(parking);
+        mDB.child(DBContract.PARKING_DB).child(parking.getParkingID()).setValue(parking);
     }
 }

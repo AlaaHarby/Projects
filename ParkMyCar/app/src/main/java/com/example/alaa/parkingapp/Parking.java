@@ -9,14 +9,20 @@ public class Parking {
     double longitude;
     String email;
     String info;
+    String parkingID;
 
     public Parking() {}
 
-    public Parking(double latitude, double longitude, String email, String info) {
+    public Parking(String parkingID, double latitude, double longitude, String email, String info) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.info = info;
         this.email = email;
+        this.parkingID = parkingID;
+    }
+
+    public String getParkingID() {
+        return parkingID;
     }
 
     public double getLongitude() {
