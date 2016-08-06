@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "55295486404",
+    "firebase_url": "https://android-parking-app.firebaseio.com",
+    "project_id": "android-parking-app",
+    "storage_bucket": "android-parking-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55295486404:android:213d55bfa32a2cd1",
+        "android_client_info": {
+          "package_name": "com.example.alaa.parkingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "55295486404-2p3fvaq84fk44fb3voevdnu8ccat9hmn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGYDB_u5MR0qUSSZu4gVDB70SPX1vXTx4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

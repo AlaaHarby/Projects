@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ParkingApp</string>
+    <string name="sign_in">Sign in</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="new_user">Sign Up</string>
+    <string name="user_name">Name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="message1">All fields are required!</string>
+    <string name="message2">Password is not correct!</string>
+    <string name="wait">Please wait!</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="permission_loc_denied">"Can't find your location"</string>
+</resources>
