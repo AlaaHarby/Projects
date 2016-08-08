@@ -54,12 +54,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SharedPreferences mSharedPref;
     private String mEmail;
     private HashMap<String, String> mParkings;
+    private int mZoomLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mDBadapter = new DBAdapter();
+        mZoomLevel = 13;
         mSharedPref = getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE);
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -172,16 +174,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (requestCode == PERMISSION_LOCATION &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            try {
-                mMap.setMyLocationEnabled(true);
                 mMarker.setVisibility(View.VISIBLE);
-                mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                mMap.animateCamera(CameraUpdateFactory
-                        .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
-
-            } catch(SecurityException e) {
-                e.printStackTrace();
-            }
+            updateLocation();
         }
         else {
             Toast.makeText(this, R.string.permission_loc_denied, Toast.LENGTH_LONG).show();
@@ -202,10 +196,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mMap.animateCamera(CameraUpdateFactory
-                    .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
-
+            updateLocation();
         } else {
             ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -225,10 +216,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
+        updateLocation();
+    }
+
+    private void updateLocation() {
         try {
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             mMap.animateCamera(CameraUpdateFactory
-                    .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
+                    .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), mZoomLevel));
+            mMap.setMyLocationEnabled(true);
 
         } catch (SecurityException e) {
             e.printStackTrace();
