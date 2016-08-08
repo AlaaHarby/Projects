@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,7 +42,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks
-        , GoogleApiClient.OnConnectionFailedListener {
+        , GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private int PERMISSION_LOCATION;
 
@@ -174,6 +175,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 mMap.setMyLocationEnabled(true);
                 mMarker.setVisibility(View.VISIBLE);
+                mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                mMap.animateCamera(CameraUpdateFactory
+                        .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
+
             } catch(SecurityException e) {
                 e.printStackTrace();
             }
@@ -198,6 +203,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            mMap.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
+
         } else {
             ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -213,6 +221,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        try {
+            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            mMap.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
+
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     public void getAddress() {
@@ -239,3 +259,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 }
+
